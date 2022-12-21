@@ -1,10 +1,10 @@
 # libstarling / starling2csv
 
-libstarling is a free and open source C library for reading and decoding [Starling](https://starling.rinet.ru/index2.php?lan=en) [linguistic databases](https://starling.rinet.ru/downl.php). It is capable of transforming text encoded using the unusual Starling system into standard UTF-8, reading Starling databases into C structs, and converting the resulting structs into plain text CSV format data.
+libstarling is a free and open source C library for reading and decoding [Starling](https://starling.rinet.ru/index2.php?lan=en) [linguistic databases](https://starling.rinet.ru/downl.php). It is capable of transcodng Starling-encoded text into standard UTF-8, reading Starling databases into C structs, and converting the resulting structs into plain text CSV format data.
 
-starling2csv is a free and open source C command-line program bundled with libstarling which allows human users to easily interface with the library and turn Starling databases into human-readable CSV files. It provides an interface to almost all of the key functions of the library.
+starling2csv is a free and open source C command-line program bundled with libstarling which allows human users to easily interface with the library and turn Starling databases into human-readable CSV files.
 
-libstarling and starling2csv are designed to be used on Unix-like systems and are not guaranteed to compile or work properly on Windows (although they may, with some tweaks). They are tested to compile properly on Linux and FreeBSD. The only prerequisites for compilation and installation are a libc (should be preinstalled on your system) with POSIX regex support, a C compiler, and CMake.
+libstarling and starling2csv are designed to be used on Unix-like systems and are not guaranteed to compile or work properly on Windows (although they may, with some tweaks). They are tested to compile properly on Linux and FreeBSD. The only prerequisites for compilation and installation are a libc (should be preinstalled on your system), a C compiler, and CMake.
 
 ## Acknowledgment
 
