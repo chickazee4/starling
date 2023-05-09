@@ -24,7 +24,7 @@ Explanation:
 
 * `foo.dbf`: the database to be decoded
 * `-c`: shorthand for `-DTS`
-    - `-D`: remove characters that conflict with standard CSV delimiting (tabs and newlines will be omitted, commas will be replaced with slashes)
+    - `-D`: remove characters that conflict with standard CSV delimiting
     - `-T`: remove Starling tags (entries often contain markup formatting tags that look like `\Iwhatever\i` — these are useless in a CSV file, so this option omits them from output)
     - `-S`: remove extraneous spaces from entries (there are often leading and trailing spaces in Starling files, and sometimes multiple spaces in a row, so this gets rid of them)
 * `-o bar.csv`: print the result to the file `bar.csv`

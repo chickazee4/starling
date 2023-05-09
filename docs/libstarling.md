@@ -1,25 +1,25 @@
 # Using libstarling
 
-Obviously, your program must be linked to `libstarling.so`.  All of `libstarling`'s functionality can then be accessed through the single header file `starling.h`:
+Your program must be linked to `libstarling.so`.  All of `libstarling`'s functionality can then be accessed through the single header file `starling.h`:
 
     #include <starling/starling.h>
 
 This header contains the following data structures:
 
-* `Field_type` (`enum`): the 12 "field types" possible for a Starling field (character, numeric, etc.). Most of these are quite rare. The "field type" is immaterial to the actual type that the data is stored as by `libstarling`, which will always be a `char *`, but it could be useful for casting/parsing the data.
+* `Starling_field_type` (`enum`): the 12 "field types" possible for a Starling field (character, numeric, etc.). Most of these are quite rare; character is the most common. The "field type" is immaterial to the actual type that the data is stored as by `libstarling`, which will always be a `char *`, but it could be useful for casting/parsing the data.
 * `Starling_entry_type` (`enum`): either `et_internal` or `et_external`. `et_external` refers to a field in the .dbf that does not contain content, but rather a pointer to somewhere in the database's .var file. `et_internal` is used for a field that contains all of its content in the .dbf itself.
 * `Starling_record_hdr` (`struct`): the struct representation of a Starling field, basically equivalent to a column of data. This struct contains the following members:
   - `name` (`char *`): the name of the field (=column heading).
-  - `type` (`Field_type`): the field's type.
-  - `offset` (`int`): offset of the given field within a given record. According to Verhoeven's specification, this value is not always trustworthy, so take it with a grain of salt. It's not used by any of `libstarling`'s internal functions, but it is filled accurately by `starling_parse_db()`.
+  - `type` (`Starling_field_type`): the field's type.
+  - `offset` (`uint32_t`): offset of the given field within a given record. According to Verhoeven's specification, this value is not always trustworthy, so take it with a grain of salt. It's not used by any of `libstarling`'s internal functions, but it is filled accurately by `starling_parse_db()`.
   - `length` (`unsigned char`): the maximal length of the field within the .dbf. Note that this value may not represent the actual length of the true content of a given entry under that field — for external entries, `Starling_record_hdr.length` will always be 6 (referring to the length of the *pointer* to the .var, not the text), but the actual length may be (and usually is) considerably longer.
   - `decimal_places` (`unsigned char`): this should store the number of decimal places belonging to a variable of a type that would have decimal places. I'm not sure how useful or reliable this is, and it's not used by any of `libstarling`'s internal functions, but it is nonetheless read and set by `starling_parse_db()` in case you need to do something with it.
   - `flags` (`unsigned char`): special flags for the field. If not 0x00 (no flags), it should be either 0x01 (system field, invisible to user), 0x02 ("nullable," according to Verhoeven — I haven't actually seen an instance of this flag, so I don't precisely know what it refers to), or 0x04 ("binary" — only for field types `ft_character` and `ft_memo`).
 * `Starling_entry` (`struct`): the struct representation of a Starling entry, analogous to a single cell of data. Contains the following members:
   - `hdr_index` (`int`): the index, relative to the entire list of fields in the database, of the field to which this entry belongs. You can therefore access the relevant `Starling_record_hdr` for this entry using `my_db.hdrs[my_entry.hdr_index]`.
   - `type` (`Starling_entry_type`): whether the entry is internal to the .dbf or externally defined in the .var.
-  - `var_offset` (`int`): if the entry is external (`Starling_entry.type == et_external`), this refers to the index in the .var buffer at which the data comainlyrresponding to the entry begins. If the entry is internal, this will be set to 0 and should not be used.
-  - `var_length` (`short int`): see above — if external, this is the number of bytes in the .var buffer corresponding to the data for this entry. If the entry is internal, this should once again be set to 0.
+  - `var_offset` (`uint32_t`): if the entry is external (`Starling_entry.type == et_external`), this refers to the index in the .var buffer at which the data comainlyrresponding to the entry begins. If the entry is internal, this will be set to 0 and should not be used.
+  - `var_length` (`uint16_t`): see above — if external, this is the number of bytes in the .var buffer corresponding to the data for this entry. If the entry is internal, this should once again be set to 0.
   - `true_length` (`int`): the actual number of bytes occupied by the data belonging to this entry, once .var pointers have been resolved and data has been decoded, if applicable.
   - `content` (`unsigned char *`): the content of the entry, not decoded at all. For an external entry, this will be set to `NULL` until `starling_decode_external()` has been used on the entry. This should not be treated like a normal string — it will usually be contaminated by null terminators, so functions like `strlen()`, `strdup()`, etc. do not work. Use the field's length (if internal) or the `var_length` (if external) for the actual length when wrangling this variable.
   - `decoded_content` (`char *`): the decoded (and if applicable, sanitized) content of the entry. This should be free of null terminators and other invalid characters, so it can be treated like a normal string.
@@ -27,17 +27,17 @@ This header contains the following data structures:
   - `is_deleted` (`int`): either 0 (not deleted) or 1 (is deleted). Whether you want to use records that have been "deleted" for your purposes is up to you — they are not automatically removed by any functions provided by `libstarling`, including `starling_tabulate_db()`.
   - `entries` (`Starling_entry *`): the list of entries within this record — the total should be the same as the number of fields (`Starling_db.hdr_ct`).
 * `Starling_db` (`struct`): the struct representation of the entire structure of a Starling database, corresponding to the content of both the .dbf and .var file, if applicable.
-  - `year` (`unsigned char`): byte 0x01 in the .dbf file, indicating the year that the database was last updated. Inexplicably, this is at some times offset from 1900, but at others offset from 2000. One way to determine which of these is the case is to see whether offsetting from 2000 would put the update year in the future (so if it's 2022, check if `year` is greater than 22) — this is what `starling2csv` does.
+  - `year` (`unsigned char`): byte 0x01 in the .dbf file, indicating the year that the database was last updated. Frustratingly, this is at some times offset from 1900, but at others offset from 2000. One way to determine which of these is the case is to see whether offsetting from 2000 would put the update year in the future and if so, assume it is offsetting from 1900 instead — this is what `starling2csv` does.
   - `month` (`unsigned char`): byte 0x02 in the .dbf file, the month at which the database was last updated. Unlike `year`, this does not have any special considerations and should not act strangely.
-  - `day` (`unsigned char`): byte 0x03 in the .dbf file, the day of the month (0x01 to 0x31) at which the database was last updated.
-  - `rec_ct` (`int`): the number of records (rows) in the database.
-  - `hdr_size` (`short int`): the size, in bytes, of the database header (the segment of the .dbf file that does not contain records). Equivalent to the offset in the .dbf file of the first record.
-  - `rec_size` (`short int`): the number of bytes occupied by each record in the .dbf file. Note that this is not equivalent to the true size of the content of each record, which may be smaller or larger depending on whether the data has been padded and whether it references an external .var entry.
+  - `day` (`unsigned char`): byte 0x03 in the .dbf file, the day of the month (0x01 to 0x1F/1 to 31) at which the database was last updated.
+  - `rec_ct` (`uint32_t`): the number of records (rows) in the database.
+  - `hdr_size` (`uint16_t`): the size, in bytes, of the database header (the segment of the .dbf file that does not contain records). Equivalent to the offset in the .dbf file of the first record.
+  - `rec_size` (`uint16_t`): the number of bytes occupied by each record in the .dbf file. Note that this is not equivalent to the true size of the content of each record, which may be smaller or larger depending on whether the data has been padded and whether it references an external .var entry.
   - `hdrs` (`Starling_record_hdr *`): pointer referencing the fields belonging to this database.
-  - `hdr_ct` (`int`): the number of fields in the database (i.e. the number of `Starling_record_hdr`s that `hdrs` points to).
+  - `hdr_ct` (`uint32_t`): the number of fields in the database (i.e. the number of `Starling_record_hdr`s that `hdrs` points to).
   - `recs` (`Starling_record *`): pointer referencing all the records belonging to the database.
   - `ext_entries` (`unsigned char *`): the entire content of the .var file associated with this database. Assume this to be contaminated with null terminators - you can't use functions like `strlen()` or `strcpy()`.
-  - `ext_len` (`int`): the number of bytes in the .var file, i.e., the size of `ext_entries`.
+  - `ext_len` (`uint32_t`): the number of bytes in the .var file, i.e., the size of `ext_entries`.
 * `Starling_sanitize_flags` (`struct`): a set of flags pertaining to text operations that will be performed on entries, for use with the `starling_tabulate_db()` and `starling_sanitize()` functions.
   - `starling_clean_delims` (`int`): if set to 1, those functions will call `starling_clean_delims()` on the input entry/entries, which deletes tabs, newlines, and commas.
   - `starling_clean_tags` (`int`): if set to 1, those functions will call `starling_clean_tags()` for each input entry/entries, deleting Starling's custom formatting tags from entry text.
@@ -110,6 +110,10 @@ Finally, the following functions are defined in `tabulate.c`:
 * `const char *starling_fieldtypetostr(Field_type ft)`: provide a human-readable single-word description of a given `Field_type`.
   - argument `ft` (`Field_type`): the `Field_type` to summarize.
   - returns: a plain-text description of `ft`.
+* `char *starling_tabulate_fields(Starling_db *db, char *delim)`: produce a plain text CSV table delineating the structure (field types) of the `Starling_db`
+  - argument `db` (`Starling_db *`): a pointer to a `Starling_db` that has already been parsed.
+  - argument `delim` (`char *`): a `char *` containing the desired CSV delimiter.
+  - returns: a `char *` containing the resulting CSV.
 * `char *starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)`: produce a plain text CSV table from a complete `Starling_db` struct.
   - argument `db` (`Starling_db *`): a pointer to a `Starling_db` that has already been parsed and that has already had its entries fully decoded. Entries do not need to be sanitized; `starling_tabulate_db()` can do this for you based on `flags->sanitize`.
   - argument `flags` (`Starling_table_flags *`): a pointer to a `Starling_table_flags` struct, defining the options for `starling_tabulate_db()`. See discussion of this struct towards the start of the document.
@@ -124,4 +128,4 @@ If you want to convert, for example, `chuket.dbf` (with an associated .var file 
 3. `Starling_table_flags myflags = { 0, 0, ",", NULL };` — set the flags for the table
 4. `char *mycsv = starling_tabulate_db(mydb, &myflags);` — produce a CSV, which will be stored in `mycsv`
 
-That's all you have to do! For more complex applications, you can consult the source code for `starling2csv`, which has a somewhat more complicated workflow in order to account for different configuration options and user choices.
+For more complex applications, you can consult the source code for `starling2csv`, which has a more developed workflow in order to account for different configuration options and user choices.

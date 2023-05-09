@@ -13,12 +13,11 @@ starling_clean_delims(char **out, const char *s, int len)
     int i = 0, j = 0;
     for(; i < len && j < len; i++){
         switch(s[i]){
+            case ',':
             case '\t':
             case '\n':
                 ret[j] = ' ';
                 j++;
-                break;
-            case ',':
                 break;
             default:
                 ret[j] = s[i];
