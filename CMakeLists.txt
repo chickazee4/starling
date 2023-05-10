@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 project(starling)
 
 option(LIBONLY "Compile only libstarling, not starling2csv." OFF)
+option(STATICLIBS "Compile libstarling as static library instead of shared" OFF)
 
 add_subdirectory(libstarling)
 
