@@ -106,7 +106,7 @@ Functions prefixed with `starling_inf_` are implemented in `inf.c`, along with o
   - returns: 1 if true, 0 if false
 * `int starling_inf_is_info_start(const char *line)`: Checks if a string is a DBINFO START code. Behaves the same as above.
 * `int starling_inf_is_alias(const char *line)`: Checks if a string contains an alias for a field. Behaves the same as above.
-* `int starling_parse_inf(Starling_db *db, char *inff)`: Populates an existing, **already parsed** (does not have to be decoded) Starling_db with metadata from a .inf file. 
+* `int starling_parse_inf(Starling_db *db, const char *inff)`: Populates an existing, **already parsed** (does not have to be decoded) Starling_db with metadata from a .inf file. 
   - argument `db`: a pointer to the Starling_db to populate. The main caveat is that it must include header data, which can be accomplished with `starling_parse_db()`.
   - argument `inff`: the filename of the .inf file. This function will read the .inf file from the provided filename on its own; you should not pass the actual contents of the file in memory. 
   - returns: an integer corresponding to a `Starling_return_code` (success = `STARLING_OK`)

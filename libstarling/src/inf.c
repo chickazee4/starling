@@ -67,11 +67,11 @@ starling_inf_clean_alias(const char *s)
     if((dresult = starling_decode_text(&out1, s + si, len - si)) <= 0)
         return NULL;
     
-    int len1 = strlen(out1), j = 0;
-    char *out2 = malloc(len1);
-    memset(out2, 0, len1);
+    int j = 0;
+    char *out2 = malloc(dresult);
+    memset(out2, 0, dresult);
 
-    for(int i = 0; i < len1; i++){
+    for(int i = 0; i < dresult; i++){
         switch(out1[i]){
             case '\\':
                 i++;
@@ -127,7 +127,7 @@ starling_inf_is_alias(const char *line)
 }
 
 int
-starling_parse_inf(Starling_db *db, char *inff)
+starling_parse_inf(Starling_db *db, const char *inff)
 {
     if(!db) return STARLING_PASSED_EMPTY_DB;
     FILE *fp;

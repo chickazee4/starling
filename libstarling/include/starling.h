@@ -120,7 +120,7 @@ char * starling_inf_clean_alias(const char *);
 int    starling_inf_is_info_end(const char *);
 int    starling_inf_is_info_start(const char *);
 int    starling_inf_is_alias(const char *);
-int    starling_parse_inf(Starling_db *, char *);
+int    starling_parse_inf(Starling_db *, const char *);
 
 // sanitize.c
 int    starling_clean_delims(char **, const char *, int);

@@ -1,7 +1,5 @@
-## Changes in current branch since v0.1.1 release
+## Changes in current branch since v0.1.1 release (newest first)
 * Added a Russian translation for starling2csv instructions.
-
-Commit #4469f78
 * Capitalized all enum values to conform with C convention
 * Somewhat improved error handling infrastructure
     - Replaced nonspecific integer-based error handling with more descriptive and consistent error enums across both libstarling and starling2csv

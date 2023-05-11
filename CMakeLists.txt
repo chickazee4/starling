@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
-project(starling)
+cmake_minimum_required(VERSION 3.12)
+project(starling VERSION 0.1.9999)
 
 option(LIBONLY "Compile only libstarling, not starling2csv." OFF)
 option(STATICLIBS "Compile libstarling as static library instead of shared" OFF)
