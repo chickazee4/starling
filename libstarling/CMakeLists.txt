@@ -3,6 +3,7 @@ if(STATICLIBS)
         starling STATIC
         src/decode.c
         src/dissect.c
+        src/inf.c
         src/sanitize.c
         src/tabulate.c
     )
@@ -11,6 +12,7 @@ else()
         starling SHARED
         src/decode.c
         src/dissect.c
+        src/inf.c
         src/sanitize.c
         src/tabulate.c
     )

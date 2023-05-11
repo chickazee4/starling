@@ -20,29 +20,29 @@ const char *
 starling_fieldtypetostr(Starling_field_type ft)
 {
     switch(ft){
-        case ft_character:
+        case FT_CHARACTER:
             return "character";
-        case ft_currency:
+        case FT_CURRENCY:
             return "currency";
-        case ft_date:
+        case FT_DATE:
             return "date";
-        case ft_datetime:
+        case FT_DATETIME:
             return "time";
-        case ft_double:
+        case FT_DOUBLE:
             return "double";
-        case ft_float:
+        case FT_FLOAT:
             return "float";
-        case ft_general:
+        case FT_GENERAL:
             return "general";
-        case ft_integer:
+        case FT_INTEGER:
             return "integer";
-        case ft_logical:
+        case FT_LOGICAL:
             return "logical";
-        case ft_memo:
+        case FT_MEMO:
             return "memo";
-        case ft_numeric:
+        case FT_NUMERIC:
             return "numeric";
-        case ft_picture:
+        case FT_PICTURE:
             return "picture";
         default:
             return NULL;
@@ -50,16 +50,24 @@ starling_fieldtypetostr(Starling_field_type ft)
 }
 
 char *
-starling_tabulate_fields(Starling_db *db, char *delim)
+starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
 {
     int rlen = db->hdr_ct * 30 + strlen(delim) * (db->hdr_ct + 2) + 15;
     char *ret = malloc(rlen), *length = malloc(10);
     memset(ret, 0, rlen);
     memset(length, 0, 10);
-    sprintf(ret, "name%stype%slength\n", delim, delim);
+    if(withinf)
+        sprintf(ret, "internal_name%shuman_name%stype%slength\n", delim, delim, delim);
+    else
+        sprintf(ret, "name%stype%slength\n", delim, delim);
     for(int i = 0; i < db->hdr_ct; i++){
         strcat(ret, db->hdrs[i].name);
         strcat(ret, delim);
+        if(withinf){
+            if(db->hdrs[i].human_name)
+                strcat(ret, db->hdrs[i].human_name);
+            strcat(ret, delim);
+        }
         strcat(ret, starling_fieldtypetostr(db->hdrs[i].type));
         strcat(ret, delim);
         snprintf(length, 10, "%i", (int)db->hdrs[i].length);
@@ -78,9 +86,9 @@ starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)
     if(flags->label_rows){
         for(int i = 0; i < db->hdr_ct; i++){
             if(flags->lowercase_labels)
-                strcat(result, lowercase(db->hdrs[i].name));
+                strcat(result, lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name)));
             else
-                strcat(result, db->hdrs[i].name);
+                strcat(result, (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
             strcat(result, flags->delimiter);
             for(int j = 0; j < db->rec_ct; j++){
                 if(!(flags->exclude_deleted && db->recs[j].is_deleted)){
@@ -97,8 +105,8 @@ starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)
     } else {
         for(int i = 0; i < db->hdr_ct; i++){
             if(flags->lowercase_labels)
-                strcat(result, lowercase(db->hdrs[i].name));
-            else strcat(result, db->hdrs[i].name);
+                strcat(result, lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name)));
+            else strcat(result, (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
             if(i < db->hdr_ct - 1) strcat(result, flags->delimiter);
         }
         strcat(result, "\n");

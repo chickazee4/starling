@@ -90,7 +90,7 @@ starling_decode_text(char **out, unsigned char *in, int len)
     if(in == NULL || len == 8224){
         char *ret = "";
         *out = ret;
-        return 0;
+        return STARLING_OK;
     }
     int bytemode = 1, cpos = 0, clen = 0;
     const char *(*current)[256] = &unibyte;
@@ -196,7 +196,7 @@ starling_decode_all_text(Starling_db *db)
     for(int i = 0; i < db->rec_ct; i++){
         for(int j = 0; j < db->hdr_ct; j++){
             if(db->recs[i].entries[j].decoded_content == NULL){
-                if(db->recs[i].entries[j].type == et_external)
+                if(db->recs[i].entries[j].type == ET_EXTERNAL)
                     elen = db->recs[i].entries[j].var_length;
                 else
                     elen = db->hdrs[db->recs[i].entries[j].hdr_index].length;
@@ -212,7 +212,7 @@ starling_decode_all_external(Starling_db *db)
 {
     for(int i = 0; i < db->rec_ct; i++){
         for(int j = 0; j < db->hdr_ct; j++){
-            if(db->recs[i].entries[j].type == et_external){
+            if(db->recs[i].entries[j].type == ET_EXTERNAL){
                 starling_decode_external(&(db->recs[i].entries[j]), &(db->ext_entries));
             }
         }
