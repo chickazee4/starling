@@ -12,7 +12,7 @@ starling_parse_records(Starling_db *out, unsigned char *raw, int len)
     Starling_record cur = {};
     for(int i = 0; i < out->rec_ct; i++){
         if(db_index > len){
-            return 3;
+            return STARLING_BAD_DB_LEN;
         }
         out->recs[i] = cur;
         if(raw[db_index] == 0x20)
@@ -20,13 +20,14 @@ starling_parse_records(Starling_db *out, unsigned char *raw, int len)
         else if(raw[db_index] == 0x2A)
             out->recs[i].is_deleted = 1;
         else
-            return 4; // corrupted record or database - missing delete flag
+            return STARLING_BAD_DELETE_FLAG;
         db_index++;
         out->recs[i].entries = calloc(out->hdr_ct, sizeof(Starling_entry));
         for(int k = 0; k < out->hdr_ct; k++){
             out->recs[i].entries[k].hdr_index = k;
-            if(out->hdrs[k].length == 6 && out->hdrs[k].type == ft_character){
-                out->recs[i].entries[k].type = et_external;
+            // .var entry
+            if(out->hdrs[k].length == 6 && out->hdrs[k].type == FT_CHARACTER){
+                out->recs[i].entries[k].type = ET_EXTERNAL;
                 out->recs[i].entries[k].content = NULL;
                 out->recs[i].entries[k].var_offset = (uint32_t)0;
                 memcpy(&(out->recs[i].entries[k].var_offset), raw + db_index, 4);
@@ -35,7 +36,8 @@ starling_parse_records(Starling_db *out, unsigned char *raw, int len)
                 memcpy(&(out->recs[i].entries[k].var_length), raw + db_index, 2);
                 db_index += 2;
             } else {
-                out->recs[i].entries[k].type = et_internal;
+                // internal db entry
+                out->recs[i].entries[k].type = ET_INTERNAL;
                 out->recs[i].entries[k].content = malloc(out->hdrs[k].length);
                 out->recs[i].entries[k].var_offset = (uint32_t)0;
                 out->recs[i].entries[k].var_length = (uint16_t)0;
@@ -45,7 +47,7 @@ starling_parse_records(Starling_db *out, unsigned char *raw, int len)
             out->recs[i].entries[k].decoded_content = NULL;
         }
     }
-    return 0;
+    return STARLING_OK;
 }
 
 int
@@ -68,61 +70,62 @@ starling_parse_header(Starling_db *out, unsigned char *raw, int len)
         memcpy(hdr.name, raw + i, 10);
         switch(raw[i + 11]){
             case 'C':
-                hdr.type = ft_character;
+                hdr.type = FT_CHARACTER;
                 break;
             case 'Y':
-                hdr.type = ft_currency;
+                hdr.type = FT_CURRENCY;
                 break;
             case 'N':
-                hdr.type = ft_numeric;
+                hdr.type = FT_NUMERIC;
                 break;
             case 'F':
-                hdr.type = ft_float;
+                hdr.type = FT_FLOAT;
                 break;
             case 'D':
-                hdr.type = ft_date;
+                hdr.type = FT_DATE;
                 break;
             case 'T':
-                hdr.type = ft_datetime;
+                hdr.type = FT_DATETIME;
                 break;
             case 'B':
-                hdr.type = ft_double;
+                hdr.type = FT_DOUBLE;
                 break;
             case 'I':
-                hdr.type = ft_integer;
+                hdr.type = FT_INTEGER;
                 break;
             case 'L':
-                hdr.type = ft_logical;
+                hdr.type = FT_LOGICAL;
                 break;
             case 'M':
-                hdr.type = ft_memo;
+                hdr.type = FT_MEMO;
                 break;
             case 'G':
-                hdr.type = ft_general;
+                hdr.type = FT_GENERAL;
                 break;
             case 'P':
-                hdr.type = ft_picture;
+                hdr.type = FT_PICTURE;
                 break;
             default:
-                return 2; // bad header
+                return STARLING_BAD_HDR;
         }
         hdr.offset = 0;
         memcpy(&(hdr.offset), raw + i + 12, 4);
         hdr.length = raw[i + 16];
         hdr.decimal_places = raw[i + 17];
         hdr.flags = raw[i + 18];
+        hdr.human_name = NULL;
         out->hdr_ct++;
         out->hdrs = realloc(out->hdrs, out->hdr_ct * sizeof(Starling_record_hdr));
         out->hdrs[out->hdr_ct - 1] = hdr;
     }
-    return 0;
+    return STARLING_OK;
 }
 
 int
 starling_parse_db(Starling_db *out, unsigned char *raw, int len)
 {
-    int r = 0;
-    if ((r = starling_parse_header(out, raw, len)) > 0) return r;
+    int r = STARLING_OK;
+    if ((r = starling_parse_header(out, raw, len)) != STARLING_OK) return r;
     else return (starling_parse_records(out, raw + out->hdr_size, len - out->hdr_size));
 }
 
@@ -163,7 +166,7 @@ starling_parse_file(int *result, char *dbf_filename, char *var_filename) // var_
                     out->ext_entries = vbuf;
                     out->ext_len = vlen;
                 } else {
-                    *result = 5; // invalid var file or inaccessible
+                    *result = STARLING_BAD_VAR_FILE; // invalid var file or inaccessible
                     return out;
                 }
             } else {

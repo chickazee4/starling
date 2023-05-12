@@ -1,3 +1,22 @@
+## Changes in current branch since v0.1.1 release (newest first)
+* Added a Russian translation for starling2csv instructions.
+* Capitalized all enum values to conform with C convention
+* Somewhat improved error handling infrastructure
+    - Replaced nonspecific integer-based error handling with more descriptive and consistent error enums across both libstarling and starling2csv
+    - Added more checkpoints and error types to improve debugging and error handling opportunities for developers
+    - Added some human-readable error descriptions to starling2csv
+* Added handling for .inf metadata files, found in `inf.c`.
+    - Also added new fields to database structs allowing the incorporation of .inf data. 
+    - Modified certain function arguments to accommodate new inf settings.
+    - Added functionality to starling2csv for dealing with these files.
+* Added a temporary safeguard in starling2csv to prevent processing databases that currently cause crashes (altet, stibet, yenet). This can be bypassed with the -z flag.
+* New flags for starling2csv:
+    - -i [FILENAME]: load a custom .inf file from FILENAME. Enables -I also.
+    - -I: use header names and output description (unless -q flag is on) from the database's .inf file (defaults to the database filename with extension changed, but may be customized using -i)
+    - -z: debug mode (bypass safeguards against using specific databases that cause breakage)
+* Updated docs to reflect these changes
+* Other minor improvements for readability/consistency/efficiency
+
 ## v0.1.1 - 05/09/23
 * Added a `starling_` prefix to every function and field that could be ambiguous in order to avoid conflicts with other libraries.
     - Removed `lowercase()` from `starling.h` entirely, as it is unlikely to be useful for most users and may conflict with similarly named functions (it is retained internally).

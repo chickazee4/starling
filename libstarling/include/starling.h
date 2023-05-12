@@ -8,24 +8,37 @@
 extern "C" {
 #endif
 
+typedef enum {
+    STARLING_OK,
+    STARLING_BAD_HDR,
+    STARLING_BAD_DELETE_FLAG,
+    STARLING_BAD_DB_LEN,
+    STARLING_BAD_DBF_FILE,
+    STARLING_BAD_VAR_FILE,
+    STARLING_BAD_INF_FILE,
+    STARLING_TABULATE_FAILED,
+    STARLING_BAD_FLAG,
+    STARLING_PASSED_EMPTY_DB
+} Starling_return_code;
+
 typedef enum { // record 0x11
-    ft_character, // C
-    ft_currency, // Y
-    ft_numeric, // N
-    ft_float, // F
-    ft_date, // D
-    ft_datetime, // T
-    ft_double, // B
-    ft_integer, // I
-    ft_logical, // L
-    ft_memo, // M
-    ft_general, // G
-    ft_picture // P
+    FT_CHARACTER, // C
+    FT_CURRENCY, // Y
+    FT_NUMERIC, // N
+    FT_FLOAT, // F
+    FT_DATE, // D
+    FT_DATETIME, // T
+    FT_DOUBLE, // B
+    FT_INTEGER, // I
+    FT_LOGICAL, // L
+    FT_MEMO, // M
+    FT_GENERAL, // G
+    FT_PICTURE // P
 } Starling_field_type;
 
 typedef enum {
-    et_external,
-    et_internal
+    ET_EXTERNAL,
+    ET_INTERNAL
 } Starling_entry_type;
 
 typedef struct {
@@ -35,6 +48,7 @@ typedef struct {
     unsigned char length;
     unsigned char decimal_places;
     unsigned char flags;
+    char *human_name;
 } Starling_record_hdr;
 
 typedef struct {
@@ -64,6 +78,7 @@ typedef struct {
     Starling_record *recs;
     unsigned char *ext_entries; // i.e. contents of var file
     uint32_t ext_len; // length of ext buffer, not number of entries
+    char *db_description; // human-readable description from .inf
 } Starling_db;
 
 typedef struct {
@@ -78,6 +93,7 @@ typedef struct {
     int exclude_deleted;
     char *delimiter;
     Starling_sanitize_flags *sanitize; // can be null
+    int use_human_names;
 } Starling_table_flags;
 
 extern const char * unibyte[256];
@@ -86,9 +102,9 @@ extern const char * grk_dualbyte[256];
 extern const char * cyr_dualbyte[256];
 
 // dissect.c
-int starling_parse_records(Starling_db *, unsigned char *, int);
-int starling_parse_header(Starling_db *, unsigned char *, int);
-int starling_parse_db(Starling_db *, unsigned char *, int);
+int           starling_parse_records(Starling_db *, unsigned char *, int);
+int           starling_parse_header(Starling_db *, unsigned char *, int);
+int           starling_parse_db(Starling_db *, unsigned char *, int);
 Starling_db * starling_parse_file(int *, char *, char *);
 
 // decode.c
@@ -98,6 +114,14 @@ void   starling_decode_all_text(Starling_db *);
 void   starling_decode_all_external(Starling_db *);
 void   starling_decode_all(Starling_db *);
 
+// inf.c
+char * starling_inf_clean_spaces(const char *, int);
+char * starling_inf_clean_alias(const char *);
+int    starling_inf_is_info_end(const char *);
+int    starling_inf_is_info_start(const char *);
+int    starling_inf_is_alias(const char *);
+int    starling_parse_inf(Starling_db *, const char *);
+
 // sanitize.c
 int    starling_clean_delims(char **, const char *, int);
 int    starling_clean_tags(char **, const char *, int);
@@ -105,8 +129,8 @@ int    starling_clean_spaces(char **, const char *, int);
 char * starling_sanitize(const char *, int, Starling_sanitize_flags *);
 
 // tabulate.c
-const char * starling_fieldtypetostr(Starling_field_type ft);
-char       * starling_tabulate_fields(Starling_db *, char *);
+const char * starling_fieldtypetostr(Starling_field_type);
+char       * starling_tabulate_fields(Starling_db *, char *, int);
 char       * starling_tabulate_db(Starling_db *, Starling_table_flags *);
 #ifdef __cplusplus
 }

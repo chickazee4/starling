@@ -12,12 +12,12 @@ I'm indebted greatly to Rob Verhoeven for publicly providing, and to Dr. Andries
 
 ## Compilation
 
-Add -DLIBONLY=true to the CMake command if you want to compile only libstarling, not starling2csv or myna. libstarling will always be compiled as a shared library regardless of whether it is compiled alone or alongside the two programs.
+Add -DLIBONLY=ON to the CMake command if you want to compile only libstarling, not starling2csv or myna. Add -DSTATICLIBS=ON if you want to statically link libstarling and starling2csv instead of building a shared library. 
 
     $ git clone https://www.github.com/chickazee4/starling.git
     $ cd starling
     $ mkdir build && cd build
-    $ cmake .. [-DLIBONLY=true]
+    $ cmake .. [-DLIBONLY=ON] [-DSTATICLIBS=ON]
     $ make
     # make install
 
