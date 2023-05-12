@@ -1,4 +1,4 @@
-## Changes in current branch since v0.1.1 release (newest first)
+## v0.1.2 - 05/12/23
 * Added a Russian translation for starling2csv instructions.
 * Capitalized all enum values to conform with C convention
 * Somewhat improved error handling infrastructure
