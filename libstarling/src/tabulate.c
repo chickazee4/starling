@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <libintl.h>
 
 #include "starling.h"
 
@@ -21,29 +23,29 @@ starling_fieldtypetostr(Starling_field_type ft)
 {
     switch(ft){
         case FT_CHARACTER:
-            return "character";
+            return gettext("character");
         case FT_CURRENCY:
-            return "currency";
+            return gettext("currency");
         case FT_DATE:
-            return "date";
+            return gettext("date");
         case FT_DATETIME:
-            return "time";
+            return gettext("time");
         case FT_DOUBLE:
-            return "double";
+            return gettext("double");
         case FT_FLOAT:
-            return "float";
+            return gettext("float");
         case FT_GENERAL:
-            return "general";
+            return gettext("general");
         case FT_INTEGER:
-            return "integer";
+            return gettext("integer");
         case FT_LOGICAL:
-            return "logical";
+            return gettext("logical");
         case FT_MEMO:
-            return "memo";
+            return gettext("memo");
         case FT_NUMERIC:
-            return "numeric";
+            return gettext("numeric");
         case FT_PICTURE:
-            return "picture";
+            return gettext("picture");
         default:
             return NULL;
     }
@@ -57,9 +59,9 @@ starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
     memset(ret, 0, rlen);
     memset(length, 0, 10);
     if(withinf)
-        sprintf(ret, "internal_name%shuman_name%stype%slength\n", delim, delim, delim);
+        sprintf(ret, "%s%s%s%s%s%s%s\n", gettext("internal_name"), delim, gettext("human_name"), delim, gettext("type"), delim, gettext("length"));
     else
-        sprintf(ret, "name%stype%slength\n", delim, delim);
+        sprintf(ret, "%s%s%s%s%s\n", gettext("name"), delim, gettext("type"), delim, gettext("length"));
     for(int i = 0; i < db->hdr_ct; i++){
         strcat(ret, db->hdrs[i].name);
         strcat(ret, delim);

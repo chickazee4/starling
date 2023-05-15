@@ -134,7 +134,7 @@ starling_parse_inf(Starling_db *db, const char *inff)
     if ((fp = fopen(inff, "r")) != NULL){
         char *line = NULL;
         size_t size;
-        int len, index = 0, ninfo = 0, *infostart_p, *infoend_p;
+        int len, index = 0, ninfo = 0, *infostart_p = malloc(4), *infoend_p = malloc(4);
         unsigned char *inf_conts = malloc(256000);
         memset(inf_conts, 0, 256000);
 

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+#include <libintl.h>
 
 #include <starling.h>
 
@@ -32,7 +33,9 @@ Starling_db *dbp;
 int
 main(int argc, char **argv)
 {
-    setlocale(LC_ALL, "en_US.UTF-8");
+    setlocale(LC_ALL, "");
+    bindtextdomain("starling", LOCALEDIR);
+    textdomain("starling");
     if(argc > 1){
         for(int i = 1; i < argc; i++){
             if(argv[i][0] == '-'){
@@ -49,7 +52,7 @@ main(int argc, char **argv)
                                 delim = argv[i+1];
                                 i++;
                             } else {
-                                fprintf(stderr, "You must specify an argument with the -d flag.\n");
+                                fprintf(stderr, "%s\n", gettext("You must specify an argument with the -d flag."));
                                 exit(STARLING_BAD_FLAG);
                             }
                             break;
@@ -65,7 +68,7 @@ main(int argc, char **argv)
                                 inf = argv[i+1];
                                 i++;
                             } else {
-                                fprintf(stderr, "You must specify an argument with the -i flag.\n");
+                                fprintf(stderr, "%s\n", gettext("You must specify an argument with the -i flag."));
                                 exit(STARLING_BAD_FLAG);
                             }
                             break;
@@ -86,7 +89,7 @@ main(int argc, char **argv)
                                 out = argv[i+1];
                                 i++;
                             } else {
-                                fprintf(stderr, "You must specify an argument with the -o flag.\n");
+                                fprintf(stderr, "%s\n", gettext("You must specify an argument with the -o flag."));
                                 exit(STARLING_BAD_FLAG);
                             }
                             break;
@@ -107,7 +110,7 @@ main(int argc, char **argv)
                                 var = argv[i+1];
                                 i++;
                             } else {
-                                fprintf(stderr, "You must specify an argument with the -v flag.\n");
+                                fprintf(stderr, "%s\n", gettext("You must specify an argument with the -v flag."));
                                 exit(STARLING_BAD_FLAG);
                             }
                             break;
@@ -126,13 +129,13 @@ main(int argc, char **argv)
     }
 
     if(dbf == NULL){
-        fprintf(stderr, "You must specify a database!\n");
+        fprintf(stderr, "%s\n", gettext("You must specify a database!"));
         exit(STARLING_BAD_DBF_FILE);
     } else if(strstr(dbf, "altet.dbf") || strstr(dbf, "stibet.dbf") || strstr(dbf, "yenet.dbf")){
         if(zflag && !qflag)
-            fprintf(stderr, "Warning: The database you're trying to load is known to cause crashes.\n");
+            fprintf(stderr, "%s\n", gettext("Warning: The database you're trying to load is known to cause crashes."));
         else if(!zflag){
-            fprintf(stderr, "Error: The database you're trying to load is known to cause crashes. Loading has been suppressed.\n");
+            fprintf(stderr, "%s\n", gettext("Error: The database you're trying to load is known to cause crashes. Loading has been suppressed."));
             exit(STARLING_BAD_DBF_FILE);
         }
     }
@@ -149,25 +152,26 @@ main(int argc, char **argv)
         }
     }
 
-    if(!qflag) printf("Accessing and parsing database...\n");
+    if(!qflag) printf("%s\n", gettext("Accessing and parsing database..."));
     int starling_parse_result;
     Starling_db *dbp = starling_parse_file(&starling_parse_result, dbf, var);
     if(starling_parse_result != STARLING_OK){
+        fprintf(stderr, "%s %i", gettext("Error"), starling_parse_result);
         switch(starling_parse_result){
             case STARLING_BAD_DB_LEN:
-                fprintf(stderr, "Error %i: Parser tried to exceed length of database\n", starling_parse_result);
+                fprintf(stderr, ": %s\n", gettext("Parser tried to exceed length of database"));
                 break;
             case STARLING_BAD_DELETE_FLAG:
-                fprintf(stderr, "Error %i: Invalid record (delete flag not detected; check for database corruption)\n", starling_parse_result);
+                fprintf(stderr, ": %s\n", gettext("Invalid record (delete flag not detected; check for database corruption)"));
                 break;
             case STARLING_BAD_HDR:
-                fprintf(stderr, "Error %i: Invalid header (check for database corruption)\n", starling_parse_result);
+                fprintf(stderr, ": %s\n", gettext("Invalid header (check for database corruption)"));
                 break;
             case STARLING_BAD_VAR_FILE:
-                fprintf(stderr, "Error %i: Invalid var file\n", starling_parse_result);
+                fprintf(stderr, ": %s\n", gettext("Invalid var file"));
                 break;
-            default:
-                fprintf(stderr, "Error %i\n", starling_parse_result);
+            default:               
+                fprintf(stderr, "\n");
                 break;
         }
         exit(starling_parse_result);
@@ -183,7 +187,7 @@ main(int argc, char **argv)
         if(access(cinf, F_OK) != -1){
             inf = cinf;
         } else {
-            fprintf(stderr, "Error: Specified -I flag, but no .inf file exists and none was provided.\n");
+            fprintf(stderr, "%s\n", gettext("Error: Specified -I flag, but no .inf file exists and none was provided."));
             exit(STARLING_BAD_INF_FILE);
         }
     }
@@ -195,33 +199,33 @@ main(int argc, char **argv)
     }
 
     if((!mflag || out) && !Mflag){
-        if(!qflag) printf("Dereferencing external variables and decoding...\n");
+        if(!qflag) printf("%s\n", gettext("Dereferencing external variables and decoding..."));
         starling_decode_all(dbp);
     }
 
     if(!qflag){
-        printf("Eureka!\n\n");
-        printf("Database last updated %u/%u/%d.\n", dbp->month, dbp->day, (dbp->year > 22 ? dbp->year + 1900 : dbp->year + 2000));
-        printf("Number of records: %d\n", dbp->rec_ct);
-        printf("Number of fields: %d\n\n", dbp->hdr_ct);
+        printf("%s\n\n", gettext("Eureka!"));
+        printf("%s %u/%u/%d.\n", gettext("Database last updated"), dbp->month, dbp->day, (dbp->year > 22 ? dbp->year + 1900 : dbp->year + 2000));
+        printf("%s: %d\n", gettext("Number of records"), dbp->rec_ct);
+        printf("%s: %d\n\n", gettext("Number of fields"), dbp->hdr_ct);
 
         if(Iflag){
-            printf("Database summary:\n%s\n", dbp->db_description);
+            printf("%s:\n%s\n", gettext("Database summary"), dbp->db_description);
         }
 
         if(mflag){
-            printf("Fields:\n");
+            printf("%s:\n", gettext("Fields"));
             for(int i = 0; i < dbp->hdr_ct; i++){
                 if(inf)
-                    printf(" * %s (type: %s; human name: %s)\n", dbp->hdrs[i].name, starling_fieldtypetostr(dbp->hdrs[i].type), (dbp->hdrs[i].human_name ? dbp->hdrs[i].human_name : "none"));
+                    printf(" * %s (%s: %s; %s: %s)\n", dbp->hdrs[i].name, gettext("type"), starling_fieldtypetostr(dbp->hdrs[i].type), gettext("human name"), (dbp->hdrs[i].human_name ? dbp->hdrs[i].human_name : "none"));
                 else
-                    printf(" * %s (type: %s)\n", dbp->hdrs[i].name, starling_fieldtypetostr(dbp->hdrs[i].type));
+                    printf(" * %s (%s: %s)\n", dbp->hdrs[i].name, gettext("type"), starling_fieldtypetostr(dbp->hdrs[i].type));
             }
         }
     }
 
     if(!mflag || out){
-        if (!qflag) printf("Generating table...\n");
+        if (!qflag) printf("%s\n", gettext("Generating table..."));
 
         char *csv = NULL;
 
@@ -234,7 +238,7 @@ main(int argc, char **argv)
         }
 
         if(csv == NULL){
-            fprintf(stderr, "Error in table creation!\n");
+            fprintf(stderr, "%s\n", gettext("Error in table creation!"));
             exit(STARLING_TABULATE_FAILED);
         }
 
@@ -242,15 +246,14 @@ main(int argc, char **argv)
             FILE *fp;
             if((fp = fopen(out, "w+")) != NULL){
                 if(!qflag)
-                    printf("Writing to file...\n");
+                    printf("%s\n", gettext("Writing to file..."));
                 fprintf(fp, "%s", csv);
                 fclose(fp);
             } else {
-                fprintf(stderr, "Warning: specified output file is in a location that does not exist or is inaccessible. Writing to stdout instead.\n");
+                fprintf(stderr, "%s\n", gettext("Warning: specified output file is in a location that does not exist or is inaccessible. Writing to stdout instead."));
                 printf("%s", csv);
             }
         } else printf("%s", csv);
     }
-
-    exit(STARLING_OK);
+    exit(0);
 }

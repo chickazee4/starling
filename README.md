@@ -41,9 +41,9 @@ Q: Do `libstarling` or `starling2csv` provide an interface for *writing* Starlin
 
 A: **No.** This is more difficult to implement than you might expect — while the functionality of `libstarling` could quite easily be extended to create structurally valid Starling files, the problem is really that Starling databases use a very non-standard character encoding that is relatively simple to convert into UTF-8, but far more difficult to convert UTF-8 into — any information that would be being written in this process would probably have been stored at some point in UTF-8, which is not (easily) reversible. The conversion of Starling databases (in this implementation) is, for all intents and purposes, a one-way street.
 
-Q: Will there be a GUI version of `starling2csv`?
+Q: Is there a GUI version of `starling2csv`?
 
-A: There is a GUI program, `myna`, currently in development. Check back soon.
+A: Yes. It can be found [here](https://github.com/chickazee4/myna).
 
 Q: How do I ask questions not listed here?
 

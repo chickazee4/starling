@@ -19,5 +19,6 @@ else()
 endif()
 
 target_include_directories(starling PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(starling ${Intl_LIBRARY})
 install(TARGETS starling)
 install(FILES include/starling.h DESTINATION include/starling)

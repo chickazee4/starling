@@ -63,6 +63,7 @@ starling_parse_header(Starling_db *out, unsigned char *raw, int len)
     out->rec_size = (uint16_t)0;
     memcpy(&(out->rec_size), raw + 10, 2);
     out->hdr_ct = 0;
+    out->hdrs = malloc(sizeof(Starling_record_hdr));
     for(int i = 32; i < out->hdr_size; i += 32){
         if(i > out->hdr_size - 32) break;
         Starling_record_hdr hdr = {};

@@ -1,3 +1,10 @@
+## v0.1.3 - 05/15/23
+* Localization suport
+    - Made all relevant strings in libstarling and starling2csv localizable via gettext (parent program must handle locale when linking against libstarling)
+    - Added a Russian localization for libstarling and starling2csv
+    - System gettext support is now mandatory for build pending more flexible infrastructure
+* Minor QOL adjustments
+
 ## v0.1.2 - 05/12/23
 * Added a Russian translation for starling2csv instructions.
 * Capitalized all enum values to conform with C convention
