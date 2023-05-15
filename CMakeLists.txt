@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 cmake_policy(SET CMP0077 NEW)
-project(starling VERSION 0.1.3)
+project(starling VERSION 0.1.9999)
 
 option(LIBONLY "Compile only libstarling, not starling2csv." OFF)
 option(STATICLIBS "Compile libstarling as static library instead of shared" OFF)
