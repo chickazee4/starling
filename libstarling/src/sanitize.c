@@ -123,12 +123,24 @@ starling_sanitize(const char *orig, int olen, Starling_sanitize_flags *flags)
         memset(result, 0, len);
         strncpy(result, orig, len);
         if(flags != NULL){
-            if(flags->clean_delims)
-                len = starling_clean_delims(&result, result, len);
-            if(flags->clean_tags)
-                len = starling_clean_tags(&result, result, len);
-            if(flags->clean_spaces)
-                len = starling_clean_spaces(&result, result, len);
+            if(flags->clean_delims){
+                char *dres = NULL;
+                len = starling_clean_delims(&dres, result, len);
+                free(result);
+                result = dres;
+            }
+            if(flags->clean_tags){
+                char *tres = NULL;
+                len = starling_clean_tags(&tres, result, len);
+                free(result);
+                result = tres;
+            }
+            if(flags->clean_spaces){
+                char *sres = NULL;
+                len = starling_clean_spaces(&sres, result, len);
+                free(result);
+                result = sres;
+            }
         }
         return result;
     } else return "";

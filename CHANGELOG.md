@@ -1,3 +1,11 @@
+## v0.2 - 05/16/23
+* Made adjustments to stabilize the three databases that were previously broken (issues [#1](https://github.com/chickazee4/starling/issues/1) and [#2](https://github.com/chickazee4/starling/issues/2))
+    - The Altaic and Sino-Tibetan databases appear to have had corrupt entries (a problem with the distributed versions, not my copies alone). libstarling now checks whether a database loaded from a file is either of these and skips over those entries if so.
+    - Yeniseian seems to have fixed itself in the course of some other change. It remains unclear what exactly was causing the problem. I will be keeping an active eye on it to make sure the issue is not reintroduced.
+    - The -z flag has been removed from starling2csv, since these databases are not problems anymore.
+* Minor adjustments to memory handling across the board
+    - Especially changed `starling_sanitize()` to stop abandoning alloc'd pointers
+
 ## v0.1.3 - 05/15/23
 * Localization suport
     - Made all relevant strings in libstarling and starling2csv localizable via gettext (parent program must handle locale when linking against libstarling)

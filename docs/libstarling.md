@@ -38,6 +38,8 @@ This header contains the following data structures:
   - `recs` (`Starling_record *`): pointer referencing all the records belonging to the database.
   - `ext_entries` (`unsigned char *`): the entire content of the .var file associated with this database. Assume this to be contaminated with null terminators - you can't use functions like `strlen()` or `strcpy()`.
   - `ext_len` (`uint32_t`): the number of bytes in the .var file, i.e., the size of `ext_entries`.
+  - `db_description` (`char *`): the description of the database from any/all DBINFO blocks in the corresponding .inf file for the database, if one exists
+  - `is_altai`/`is_stibet` (`int`): indicate whether the database is altai.dbf or stibet.dbf. Both appear to have specific corrupted records in the versions distributed by the Starling website and will crash the program unless this is set. This will omit the responsible records in output: in altet.dbf, only the 5th field of the 1728th record is impacted, while in stibet.dbf, the entire 2785th record is skipped due to multiple corrupted entries. 
 * `Starling_sanitize_flags` (`struct`): a set of flags pertaining to text operations that will be performed on entries, for use with the `starling_tabulate_db()` and `starling_sanitize()` functions.
   - `starling_clean_delims` (`int`): if set to 1, those functions will call `starling_clean_delims()` on the input entry/entries, which deletes tabs, newlines, and commas.
   - `starling_clean_tags` (`int`): if set to 1, those functions will call `starling_clean_tags()` for each input entry/entries, deleting Starling's custom formatting tags from entry text.

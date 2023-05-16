@@ -51,4 +51,4 @@ A: If your question is not about an apparent software bug and is not a feature s
 
 ### Open issues
 
-* altet.dbf, stibet.dbf, and yenet.dbf cause crashes — the first two appear to be the result of the same underlying issue, but Yeniseian appears to be a separate problem. See issues [#1](https://github.com/chickazee4/starling/issues/1) and [#2](https://github.com/chickazee4/starling/issues/2) respectively.
+None, currently.

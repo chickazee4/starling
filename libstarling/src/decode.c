@@ -213,7 +213,9 @@ starling_decode_all_external(Starling_db *db)
     for(int i = 0; i < db->rec_ct; i++){
         for(int j = 0; j < db->hdr_ct; j++){
             if(db->recs[i].entries[j].type == ET_EXTERNAL){
-                starling_decode_external(&(db->recs[i].entries[j]), &(db->ext_entries));
+                if ((!db->is_altai || i != 1727 || j != 5) && (!db->is_stibet || i != 2784))
+                    starling_decode_external(&(db->recs[i].entries[j]), &(db->ext_entries));
+                else db->recs[i].entries[j].content = NULL;
             }
         }
     }

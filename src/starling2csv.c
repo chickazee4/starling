@@ -25,8 +25,7 @@ int dflag = 0,
     sflag = 0,
     Sflag = 0,
     Tflag = 0,
-    Vflag = 0,
-    zflag = 0;
+    Vflag = 0;
 
 Starling_db *dbp;
 
@@ -117,9 +116,6 @@ main(int argc, char **argv)
                         case 'V':
                             Vflag++;
                             break;
-                        case 'z':
-                            zflag++;
-                            break;
                     }
                 }
             } else {
@@ -128,33 +124,27 @@ main(int argc, char **argv)
         }
     }
 
-    if(dbf == NULL){
+    if(!dbf){
         fprintf(stderr, "%s\n", gettext("You must specify a database!"));
         exit(STARLING_BAD_DBF_FILE);
-    } else if(strstr(dbf, "altet.dbf") || strstr(dbf, "stibet.dbf") || strstr(dbf, "yenet.dbf")){
-        if(zflag && !qflag)
-            fprintf(stderr, "%s\n", gettext("Warning: The database you're trying to load is known to cause crashes."));
-        else if(!zflag){
-            fprintf(stderr, "%s\n", gettext("Error: The database you're trying to load is known to cause crashes. Loading has been suppressed."));
-            exit(STARLING_BAD_DBF_FILE);
-        }
     }
 
-    if(var == NULL && !Vflag){
+    if(!var && !Vflag){
         int len = strlen(dbf);
-        char *cvar = malloc(len);
-        strcpy(cvar, dbf);
-        cvar[len-3] = 'v';
-        cvar[len-2] = 'a';
-        cvar[len-1] = 'r';
-        if(access(cvar, F_OK) != -1){
-            var = cvar;
-        }
+        var = malloc(len + 1);
+        strcpy(var, dbf);
+        var[len-3] = 'v';
+        var[len-2] = 'a';
+        var[len-1] = 'r';
+        if(access(var, F_OK) == -1)
+            var = NULL;
     }
 
-    if(!qflag) printf("%s\n", gettext("Accessing and parsing database..."));
+    if(!qflag)
+        printf("%s\n", gettext("Accessing and parsing database..."));
     int starling_parse_result;
     Starling_db *dbp = starling_parse_file(&starling_parse_result, dbf, var);
+    free(var);
     if(starling_parse_result != STARLING_OK){
         fprintf(stderr, "%s %i", gettext("Error"), starling_parse_result);
         switch(starling_parse_result){
@@ -179,14 +169,12 @@ main(int argc, char **argv)
 
     if(Iflag && !inf){
         int len = strlen(dbf);
-        char *cinf = malloc(len);
-        strcpy(cinf, dbf);
-        cinf[len-3] = 'i';
-        cinf[len-2] = 'n';
-        cinf[len-1] = 'f';
-        if(access(cinf, F_OK) != -1){
-            inf = cinf;
-        } else {
+        inf = malloc(len + 1);
+        strcpy(inf, dbf);
+        inf[len-3] = 'i';
+        inf[len-2] = 'n';
+        inf[len-1] = 'f';
+        if(access(inf, F_OK) == -1){
             fprintf(stderr, "%s\n", gettext("Error: Specified -I flag, but no .inf file exists and none was provided."));
             exit(STARLING_BAD_INF_FILE);
         }
@@ -237,12 +225,12 @@ main(int argc, char **argv)
             csv = starling_tabulate_db(dbp, &tf);
         }
 
-        if(csv == NULL){
+        if(!csv){
             fprintf(stderr, "%s\n", gettext("Error in table creation!"));
             exit(STARLING_TABULATE_FAILED);
         }
 
-        if(out != NULL){
+        if(out){
             FILE *fp;
             if((fp = fopen(out, "w+")) != NULL){
                 if(!qflag)

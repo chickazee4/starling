@@ -15,7 +15,6 @@ Usage: starling2csv [DBF FILENAME] (OPTIONS...)
     -T              Cleanse outputs of Starling formatting tags (probably a good idea unless you are doing something unusual with the CSV).
     -v FILENAME     Filename of the .VAR file associated with the .DBF that you are converting (you do not need to specify this if it is in the same directory as the .DBF and has the same basename, e.g. japet.dbf and japet.var).
     -V              Override automatic .VAR file detection if you don't specify a -v (i.e., if you want to decode japet.dbf without using japet.var *or any other .VAR*). Not necessary if you specify -v with a valid filename.
-    -z              Debug mode (ignore safeguards against loading databases that break the program).
 
 Option globbing is supported.
 

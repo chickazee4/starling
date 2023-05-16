@@ -21,6 +21,8 @@ lowercase(const char *in)
 const char *
 starling_fieldtypetostr(Starling_field_type ft)
 {
+    bindtextdomain("starling", LOCALEDIR);
+    textdomain("starling");
     switch(ft){
         case FT_CHARACTER:
             return gettext("character");
@@ -54,6 +56,8 @@ starling_fieldtypetostr(Starling_field_type ft)
 char *
 starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
 {
+    bindtextdomain("starling", LOCALEDIR);
+    textdomain("starling");
     int rlen = db->hdr_ct * 30 + strlen(delim) * (db->hdr_ct + 2) + 15;
     char *ret = malloc(rlen), *length = malloc(10);
     memset(ret, 0, rlen);

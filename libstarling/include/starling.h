@@ -18,7 +18,8 @@ typedef enum {
     STARLING_BAD_INF_FILE,
     STARLING_TABULATE_FAILED,
     STARLING_BAD_FLAG,
-    STARLING_PASSED_EMPTY_DB
+    STARLING_PASSED_EMPTY_DB,
+    STARLING_MEM_ERR
 } Starling_return_code;
 
 typedef enum { // record 0x11
@@ -79,6 +80,8 @@ typedef struct {
     unsigned char *ext_entries; // i.e. contents of var file
     uint32_t ext_len; // length of ext buffer, not number of entries
     char *db_description; // human-readable description from .inf
+    int is_altai; // altaic needs an adjustment due to internal corruption in the version distributed
+    int is_stibet; // likewise
 } Starling_db;
 
 typedef struct {

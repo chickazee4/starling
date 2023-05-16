@@ -9,12 +9,11 @@ starling_parse_records(Starling_db *out, unsigned char *raw, int len)
 {
     int db_index = 0;
     out->recs = calloc(out->rec_ct, sizeof(Starling_record));
-    Starling_record cur = {};
+    memset(out->recs, 0, out->rec_ct * sizeof(Starling_record));
     for(int i = 0; i < out->rec_ct; i++){
         if(db_index > len){
             return STARLING_BAD_DB_LEN;
         }
-        out->recs[i] = cur;
         if(raw[db_index] == 0x20)
             out->recs[i].is_deleted = 0;
         else if(raw[db_index] == 0x2A)
@@ -138,11 +137,16 @@ starling_parse_file(int *result, char *dbf_filename, char *var_filename) // var_
         result = &i;
     }
     Starling_db *out = malloc(sizeof(Starling_db));
-
     FILE *fp;
     unsigned char *buf;
     long len;
     if ((fp = fopen(dbf_filename, "rb")) != NULL){
+        if(strstr(dbf_filename, "altet.dbf"))
+            out->is_altai = 1;
+        else out->is_altai = 0;
+        if(strstr(dbf_filename, "stibet.dbf"))
+            out->is_stibet = 1;
+        else out->is_stibet = 0;
         fseek(fp, 0L, SEEK_END);
         len = ftell(fp);
         fseek(fp, 0L, SEEK_SET);
@@ -153,7 +157,7 @@ starling_parse_file(int *result, char *dbf_filename, char *var_filename) // var_
         if((*result = starling_parse_db(out, buf, len)) > 0){
             return out;
         } else {
-            if(var_filename != NULL){
+            if(var_filename){
                 FILE *vfp;
                 unsigned char *vbuf;
                 long vlen;
