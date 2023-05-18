@@ -18,8 +18,10 @@ typedef enum {
     STARLING_BAD_INF_FILE,
     STARLING_TABULATE_FAILED,
     STARLING_BAD_FLAG,
+    STARLING_MEM_ERR,
     STARLING_PASSED_EMPTY_DB,
-    STARLING_MEM_ERR
+    STARLING_PASSED_EMPTY_TABLE_FLAGS,
+    STARLING_EMPTY_CONTENTS // not necessarily an error
 } Starling_return_code;
 
 typedef enum { // record 0x11
@@ -126,14 +128,16 @@ int    starling_inf_is_alias(const char *);
 int    starling_parse_inf(Starling_db *, const char *);
 
 // sanitize.c
-int    starling_clean_delims(char **, const char *, int);
-int    starling_clean_tags(char **, const char *, int);
-int    starling_clean_spaces(char **, const char *, int);
-char * starling_sanitize(const char *, int, Starling_sanitize_flags *);
+int starling_clean_delims(char **, const char *, int);
+int starling_clean_tags(char **, const char *, int);
+int starling_clean_spaces(char **, const char *, int);
+int starling_sanitize(char **, const char *, int, Starling_sanitize_flags *);
 
 // tabulate.c
 const char * starling_fieldtypetostr(Starling_field_type);
 char       * starling_tabulate_fields(Starling_db *, char *, int);
+char       * starling_tabulate_db_wide(Starling_db *, Starling_table_flags *);
+char       * starling_tabulate_db_tall(Starling_db *, Starling_table_flags *);
 char       * starling_tabulate_db(Starling_db *, Starling_table_flags *);
 #ifdef __cplusplus
 }

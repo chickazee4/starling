@@ -11,7 +11,8 @@ char *
 lowercase(const char *in)
 {
     int len = strlen(in);
-    char *out = malloc(len);
+    char *out = malloc(len + 1);
+    memset(out, 0, len + 1);
     for(int i = 0; i < len; i++){
         out[i] = tolower(in[i]);
     }
@@ -58,22 +59,27 @@ starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
 {
     bindtextdomain("starling", LOCALEDIR);
     textdomain("starling");
-    int rlen = db->hdr_ct * 30 + strlen(delim) * (db->hdr_ct + 2) + 15;
-    char *ret = malloc(rlen), *length = malloc(10);
-    memset(ret, 0, rlen);
+    char *ret = NULL, *length = malloc(10);
+    int clen = 0, dlen = strlen(delim);
     memset(length, 0, 10);
-    if(withinf)
-        sprintf(ret, "%s%s%s%s%s%s%s\n", gettext("internal_name"), delim, gettext("human_name"), delim, gettext("type"), delim, gettext("length"));
-    else
-        sprintf(ret, "%s%s%s%s%s\n", gettext("name"), delim, gettext("type"), delim, gettext("length"));
     for(int i = 0; i < db->hdr_ct; i++){
+        clen += strlen(db->hdrs[i].name) + dlen + 2;
+        ret = realloc(ret, clen);
+        if(i == 0) memset(ret, 0, clen);
         strcat(ret, db->hdrs[i].name);
         strcat(ret, delim);
         if(withinf){
-            if(db->hdrs[i].human_name)
+            if(db->hdrs[i].human_name){
+                clen += strlen(db->hdrs[i].human_name) + 1;
+                ret = realloc(ret, clen);
                 strcat(ret, db->hdrs[i].human_name);
+            }
+            clen += dlen + 1;
+            ret = realloc(ret, dlen);
             strcat(ret, delim);
         }
+        clen += strlen(starling_fieldtypetostr(db->hdrs[i].type)) + dlen + 13;
+        ret = realloc(ret, clen);
         strcat(ret, starling_fieldtypetostr(db->hdrs[i].type));
         strcat(ret, delim);
         snprintf(length, 10, "%i", (int)db->hdrs[i].length);
@@ -85,50 +91,99 @@ starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
 }
 
 char *
-starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)
+starling_tabulate_db_tall(Starling_db *db, Starling_table_flags *flags)
 {
-    char *result = malloc(25600000), *sanitized = NULL;
-    memset(result, 0, 25600000);
-    if(flags->label_rows){
-        for(int i = 0; i < db->hdr_ct; i++){
-            if(flags->lowercase_labels)
-                strcat(result, lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name)));
-            else
-                strcat(result, (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
+    char *result = NULL, *sanitized = NULL, *header = NULL;
+    int clen = 0, dlen = strlen(flags->delimiter);
+    for(int i = 0; i < db->hdr_ct; i++){
+        if(flags->lowercase_labels){
+            header = lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
+            clen += strlen(header) + 1;
+            result = realloc(result, clen);
+            strcat(result, header);
+            free(header);
+        } else {
+            header = (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name);
+            clen += strlen(header) + 1;
+            result = realloc(result, clen);
+            strcat(result, header);
+        }
+        if(i < db->hdr_ct - 1){
+            clen += dlen + 1;
+            result = realloc(result, clen);
             strcat(result, flags->delimiter);
-            for(int j = 0; j < db->rec_ct; j++){
-                if(!(flags->exclude_deleted && db->recs[j].is_deleted)){
-                    if((sanitized = starling_sanitize(db->recs[j].entries[i].decoded_content, db->recs[i].entries[j].true_length, flags->sanitize))){
-                        strcat(result, sanitized);
-                        strcat(result, flags->delimiter);
-                    } else {
-                        return NULL; // error
-                    }
+        }
+    }
+    clen += 2;
+    result = realloc(result, clen);
+    strcat(result, "\n");
+    for(int i = 0; i < db->rec_ct; i++){
+        if(!(flags->exclude_deleted && db->recs[i].is_deleted)){
+            for(int j = 0; j < db->hdr_ct; j++){
+                if(((starling_sanitize(&sanitized, db->recs[i].entries[j].decoded_content, db->recs[i].entries[j].true_length, flags->sanitize)) != STARLING_PASSED_EMPTY_TABLE_FLAGS) && sanitized){
+                    clen += strlen(sanitized) + 1;
+                    result = realloc(result, clen);
+                    strcat(result, sanitized);
+                    free(sanitized);
+                }
+                if(j < db->hdr_ct - 1){
+                    clen += 2;
+                    result = realloc(result, clen);
+                    strcat(result, flags->delimiter);
                 }
             }
+            clen += 2;
+            result = realloc(result, clen);
             strcat(result, "\n");
-        }
-    } else {
-        for(int i = 0; i < db->hdr_ct; i++){
-            if(flags->lowercase_labels)
-                strcat(result, lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name)));
-            else strcat(result, (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
-            if(i < db->hdr_ct - 1) strcat(result, flags->delimiter);
-        }
-        strcat(result, "\n");
-        for(int i = 0; i < db->rec_ct; i++){
-            if(!(flags->exclude_deleted && db->recs[i].is_deleted)){
-                for(int j = 0; j < db->hdr_ct; j++){
-                    if((sanitized = starling_sanitize(db->recs[i].entries[j].decoded_content, db->recs[i].entries[j].true_length, flags->sanitize))){
-                        strcat(result, sanitized);
-                        if(j < db->hdr_ct - 1) strcat(result, flags->delimiter);
-                    } else {
-                        return NULL; // error
-                    }
-                }
-                strcat(result, "\n");
-            }
         }
     }
     return result;
+}
+
+char *
+starling_tabulate_db_wide(Starling_db *db, Starling_table_flags *flags)
+{
+    char *result = NULL, *sanitized = NULL, *header = NULL;
+    int clen = 0, dlen = strlen(flags->delimiter);
+    for(int i = 0; i < db->hdr_ct; i++){
+        if(flags->lowercase_labels){
+            header = lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
+            clen += strlen(header) + 1;
+            result = realloc(result, clen);
+            strcat(result, header);
+            free(header);
+        } else {
+            header = (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name);
+            clen += strlen(header) + 1;
+            result = realloc(result, clen);
+            strcat(result, header);
+        }
+        clen += dlen + 1;
+        result = realloc(result, clen);
+        strcat(result, flags->delimiter);
+        for(int j = 0; j < db->rec_ct; j++){
+            if(!(flags->exclude_deleted && db->recs[j].is_deleted)){
+                if(((starling_sanitize(&sanitized, db->recs[j].entries[i].decoded_content, db->recs[j].entries[i].true_length, flags->sanitize)) != STARLING_PASSED_EMPTY_TABLE_FLAGS) && sanitized){
+                    clen += strlen(sanitized) + dlen + 1;
+                    result = realloc(result, clen);
+                    strcat(result, sanitized);
+                    free(sanitized);
+                    strcat(result, flags->delimiter);
+                }
+            }
+        }
+        clen += 2;
+        result = realloc(result, clen);
+        strcat(result, "\n");
+    }
+    return result;
+}
+
+char *
+starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)
+{
+    if(flags->label_rows)
+        return starling_tabulate_db_wide(db, flags);
+    else
+        return starling_tabulate_db_tall(db, flags);
 }

@@ -1,3 +1,13 @@
+## Current
+* Improvements to memory handling in tabulate/sanitize functions
+    - Tabulate previously allocated a set amount of memory; a hypothetical very large database would have crashed the program. It now flexibly allocates memory depending on the database, which reduces memory consumption in most cases and makes the library more extensible. Slightly laggier operation and CPU usage when tabulating may be noticed, but these appear to be relatively minimal and should be outweighed by the benefits. 
+    - All pointers allocated by sanitize functions *should* now be freeable, reducing the incidence of memory leaks in starling2csv and any other software derivative of libstarling.
+* Changes to the invocation of the aforementioned functions
+    - Unfortunately, the changes to sanitize memory handling have required breaking `starling_sanitize()` invocation: it now takes a `char **` argument, pointing to the desired output, and returns a `Starling_return_code` (casted to integer).
+    - Invocations of other individual sanitize functions must now provide pointers with preallocated memory the exact size of the passed `len`. Uninitialized pointers will lead to segfaults.
+* Two new tabulate functions (`starling_tabulate_db_[wide/tall]`) have been added, which do not provide new functionality, but may improve code flow and clarity. These simply delineate the two table formats supported by libstarling (rows vs. columns based on database headers, respectively).
+    - `starling_tabulate_db()` will remain present and no changes are required to existing references to it. It now serves simply as a wrapper to these two functions.
+
 ## v0.2 - 05/16/23
 * Made adjustments to stabilize the three databases that were previously broken (issues [#1](https://github.com/chickazee4/starling/issues/1) and [#2](https://github.com/chickazee4/starling/issues/2))
     - The Altaic and Sino-Tibetan databases appear to have had corrupt entries (a problem with the distributed versions, not my copies alone). libstarling now checks whether a database loaded from a file is either of these and skips over those entries if so.

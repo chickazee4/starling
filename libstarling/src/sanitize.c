@@ -8,32 +8,29 @@
 int
 starling_clean_delims(char **out, const char *s, int len)
 {
-    char *ret = malloc(len);
-    memset(ret, 0, len);
+    memset(*out, 0, len);
     int i = 0, j = 0;
     for(; i < len && j < len; i++){
         switch(s[i]){
             case ',':
             case '\t':
             case '\n':
-                ret[j] = ' ';
+                (*out)[j] = ' ';
                 j++;
                 break;
             default:
-                ret[j] = s[i];
+                (*out)[j] = s[i];
                 j++;
                 break;
         }
     }
-    *out = ret;
     return j;
 }
 
 int
 starling_clean_tags(char **out, const char *s, int len)
 {
-    char *ret = malloc(len);
-    memset(ret, 0, len);
+    memset(*out, 0, len);
     int i = 0, j = 0;
     for(; i < len && j < len; i++){
         if(s[i] == '\\'){
@@ -64,27 +61,25 @@ starling_clean_tags(char **out, const char *s, int len)
                             break;
                         } else break;
                     default:
-                        ret[j] = s[i];
-                        ret[j+1] = s[i+1];
+                        (*out)[j] = s[i];
+                        (*out)[j+1] = s[i+1];
                         i++;
                         j += 2;
                         break;
                 }
             }
         } else {
-            ret[j] = s[i];
+            (*out)[j] = s[i];
             j++;
         }
     }
-    *out = ret;
     return j;
 }
 
 int
 starling_clean_spaces(char **out, const char *s, int len)
 {
-    char *ret = malloc(len);
-    memset(ret, 0, len);
+    memset(*out, 0, len);
     int i = 0, j = 0, content_started = 0;
     // part 1 - clear leading spaces and multi-spaces
     for(; i < len && j < len;){
@@ -95,53 +90,57 @@ starling_clean_spaces(char **out, const char *s, int len)
             i--;
         } else {
             content_started = 1;
-            ret[j] = s[i];
+            (*out)[j] = s[i];
             j++;
             i++;
         }
     }
-    int rlen = strlen(ret);
+    int rlen = strlen(*out);
     // part 2 - cut off the string when trailing spaces begin, if there are any
-    if(ret[rlen - 1] == ' '){
+    if((*out)[rlen - 1] == ' '){
         int k = rlen - 1;
-        while(isspace(ret[k])) k--;
-        ret[k + 1] = '\0';
-        *out = ret;
+        while(isspace((*out)[k])) k--;
+        (*out)[k + 1] = '\0';
         return k + 2;
     } else {
-        *out = ret;
         return rlen;
     }
 }
 
-char *
-starling_sanitize(const char *orig, int olen, Starling_sanitize_flags *flags)
+int
+starling_sanitize(char **out, const char *orig, int olen, Starling_sanitize_flags *flags)
 {
     int len = olen;
-    if(strcmp(orig, "") != 0) {
-        char *result = malloc(len);
-        memset(result, 0, len);
-        strncpy(result, orig, len);
-        if(flags != NULL){
+    *out = NULL;
+    if(orig && (strcmp(orig, "") != 0)) {
+        *out = malloc(len);
+        memset(*out, 0, len);
+        strncpy(*out, orig, len);
+        if(flags){
             if(flags->clean_delims){
-                char *dres = NULL;
-                len = starling_clean_delims(&dres, result, len);
-                free(result);
-                result = dres;
+                char *dres = malloc(len);
+                len = starling_clean_delims(&dres, *out, len);
+                memset(*out, 0, olen);
+                strncpy(*out, dres, len);
+                free(dres);
             }
             if(flags->clean_tags){
-                char *tres = NULL;
-                len = starling_clean_tags(&tres, result, len);
-                free(result);
-                result = tres;
+                char *tres = malloc(len);
+                len = starling_clean_tags(&tres, *out, len);
+                memset(*out, 0, olen);
+                strncpy(*out, tres, len);
+                free(tres);
             }
             if(flags->clean_spaces){
-                char *sres = NULL;
-                len = starling_clean_spaces(&sres, result, len);
-                free(result);
-                result = sres;
+                char *sres = malloc(len);
+                len = starling_clean_spaces(&sres, *out, len);
+                memset(*out, 0, olen);
+                strncpy(*out, sres, len);
+                free(sres);
             }
-        }
-        return result;
-    } else return "";
+        } else return STARLING_PASSED_EMPTY_TABLE_FLAGS;
+        return STARLING_OK;
+    } else {
+        return STARLING_OK & STARLING_EMPTY_CONTENTS;
+    }
 }

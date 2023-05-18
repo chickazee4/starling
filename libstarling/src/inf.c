@@ -169,11 +169,12 @@ starling_parse_inf(Starling_db *db, const char *inff)
 
         for(int i = 0; i < ninfo; i++){
             dlen = infoend_p[i] - infostart_p[i] + 1;
-            char *decoded = malloc(dlen), *cleaned = NULL;
+            char *decoded = malloc(dlen);
             memset(decoded, 0, dlen);
             if((dlen = starling_decode_text(&decoded, inf_conts + infostart_p[i], infoend_p[i] - infostart_p[i])) <= 0)
                 return STARLING_BAD_INF_FILE;
             // db descriptions tend to include tags and spaces that can be cleaned out
+            char *cleaned = malloc(dlen);
             starling_clean_tags(&cleaned, decoded, dlen);
             strcat(infos, starling_inf_clean_spaces(cleaned, strlen(cleaned)));
             // avoid taking up unnecessary mem

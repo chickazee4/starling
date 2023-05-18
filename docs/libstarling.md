@@ -116,17 +116,18 @@ Functions prefixed with `starling_inf_` are implemented in `inf.c`, along with o
 Functions prefixed with `starling_clean_` are implemented in `sanitize.c`, along with one other function.
 
 * `int starling_clean_delims(char **out, const char *s, int len)`: remove tabs, newlines, and commas from a string (mainly useful for generating clean CSVs).
-  - argument `out` (`char **`): a pointer to a string that will contain the result.
+  - argument `out` (`char **`): a pointer to an **already allocated** string that will contain the result.
   - argument `s` (`const char *`): a pointer to the string that will be cleaned.
   - argument `len` (`int`) the length of the string that will be cleaned.
   - returns: the length, in number of bytes, of `out`.
 * `int starling_clean_tags(char **out, const char *s, int len)`: remove Starling formatting tags (which look like \Ithis, for example\i) from a string. Arguments and the return value are the same as for `starling_clean_delims()`.
 * `int starling_clean_spaces(char **out, const char *s, int len)`: remove leading, trailing, and repeated spaces from a string. Arguments and return value are the same as for the other two `starling_clean_` functions.
-* `char *starling_sanitize(const char *orig, int len, Starling_sanitize_flags *flags)`: wrapper around the other three functions, which calls them conditionally based on the values in `flags`. Doesn't do anything else unique.
+* `int starling_sanitize(char **out, const char *orig, int len, Starling_sanitize_flags *flags)`: wrapper around the other three functions, which calls them conditionally based on the values in `flags`. Doesn't do anything else unique.
+  - argument `out`: a pointer to the pointer in which the resulting sanitized string should be stored. `*out` does not need to be allocated (and in fact should not be; memory will leak otherwise).
   - argument `orig` (`const char *`): the string to sanitize.
   - argument `len` (`int`): the length of the string to sanitize.
   - argument `flags` (`Starling_sanitize_flags *`): the flags for `starling_sanitize()` to use (=which of the above three functions should be performed). This may be set to `NULL` if no operations are to be performed. See also the explanation of `Starling_sanitize_flags` towards the start of this document.
-  - returns: the sanitized string.
+  - returns: a `Starling_return_code` indicating success, qualified success (`STARLING_OK & STARLING_EMPTY_CONTENTS`), or failure.
 
 Finally, the following functions are defined in `tabulate.c`:
 * `const char *starling_fieldtypetostr(Field_type ft)`: provide a human-readable single-word description of a given `Field_type`.
@@ -137,10 +138,12 @@ Finally, the following functions are defined in `tabulate.c`:
   - argument `delim` (`char *`): a `char *` containing the desired CSV delimiter.
   - argument `withinf` (`int`): set to 1 if the table should include human field names from an .inf file, 0 otherwise. **Don't** enable this unless you have already performed `starling_parse_inf()` on the database. 
   - returns: a `char *` containing the resulting CSV.
-* `char *starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)`: produce a plain text CSV table from a complete `Starling_db` struct.
+* `char *starling_tabulate_db_wide(Starling_db *db, Starling_table_flags *flags)`: produce a plain text CSV table from a complete `Starling_db` struct, where the headers are used to label rows of the resulting table.
   - argument `db` (`Starling_db *`): a pointer to a `Starling_db` that has already been parsed and that has already had its entries fully decoded. Entries do not need to be sanitized; `starling_tabulate_db()` can do this for you based on `flags->sanitize`.
   - argument `flags` (`Starling_table_flags *`): a pointer to a `Starling_table_flags` struct, defining the options for `starling_tabulate_db()`. See discussion of this struct towards the start of the document.
   - returns: a `char *` containing the resulting CSV.
+* `char *starling_tabulate_db_tall(Starling_db *db, Starling_table_flags *flags)`: produce a plain text CSV table from a complete `Starling_db` struct, where the headers are used to label columns of the resulting table. Arguments the same as above.
+* `char *starling_tabulate_db(Starling_db *db, Starling_table_flags *flags)`: produce a plain text CSV table from a complete `Starling_db` struct. Decides which of the table formats to use based on `flags->label_rows`. Arguments the same as above.
 
 ## Minimal example steps
 
