@@ -1,6 +1,6 @@
 ## v0.3.0
 * Improvements to memory handling in tabulate/sanitize functions
-    - Tabulate previously allocated a set amount of memory; a hypothetical very large database would have crashed the program. It now flexibly allocates memory depending on the database, which reduces memory consumption in most cases and makes the library more extensible. Slightly laggier operation and CPU usage when tabulating may be noticed, but these appear to be relatively minimal and should be outweighed by the benefits. 
+    - Tabulate previously allocated a finite amount of memory; a hypothetical very large database would have overflown the buffer, although none of Starostin's are actually big enough. It now flexibly allocates memory depending on the database, which reduces memory consumption in most cases and makes the library more extensible. Slightly laggier operation and increased CPU usage when tabulating may be noticed, but these appear to be relatively minimal and should be outweighed by the benefits. 
     - All pointers allocated by sanitize functions *should* now be freeable, reducing the incidence of memory leaks in starling2csv and any other software derivative of libstarling.
 * Changes to the invocation of the aforementioned functions
     - Unfortunately, the changes to sanitize memory handling have required breaking `starling_sanitize()` invocation: it now takes a `char **` argument, pointing to the desired output, and returns a `Starling_return_code` (casted to integer).
@@ -9,7 +9,7 @@
     - `starling_tabulate_db()` will remain present and no changes are required to existing references to it. It now serves simply as a wrapper to these two functions.
 * Made libintl support optional
     - CMake checks for presence and adds compile definitions
-    - Added some preprocessor macros to prevent invalid references to it
+    - Added some preprocessor macros to prevent invalid references
     - Program will default to English messages without internationalization support
 * Changed references to gettext() to _() to make typing easier if messages are expanded and to reduce disruption of code flow
 * Note: Tested macOS build for the first time — it works without changes

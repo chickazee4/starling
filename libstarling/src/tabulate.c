@@ -100,13 +100,13 @@ starling_tabulate_db_tall(Starling_db *db, Starling_table_flags *flags)
     int clen = 0, dlen = strlen(flags->delimiter);
     for(int i = 0; i < db->hdr_ct; i++){
         if(flags->lowercase_labels){
-            header = lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
+            header = lowercase(((flags->use_human_names && db->hdrs[i].human_name) ? db->hdrs[i].human_name : db->hdrs[i].name));
             clen += strlen(header) + 1;
             result = realloc(result, clen);
             strcat(result, header);
             free(header);
         } else {
-            header = (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name);
+            header = ((flags->use_human_names && db->hdrs[i].human_name) ? db->hdrs[i].human_name : db->hdrs[i].name);
             clen += strlen(header) + 1;
             result = realloc(result, clen);
             strcat(result, header);
@@ -150,13 +150,13 @@ starling_tabulate_db_wide(Starling_db *db, Starling_table_flags *flags)
     int clen = 0, dlen = strlen(flags->delimiter);
     for(int i = 0; i < db->hdr_ct; i++){
         if(flags->lowercase_labels){
-            header = lowercase((flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name));
+            header = lowercase(((flags->use_human_names && db->hdrs[i].human_name) ? db->hdrs[i].human_name : db->hdrs[i].name));
             clen += strlen(header) + 1;
             result = realloc(result, clen);
             strcat(result, header);
             free(header);
         } else {
-            header = (flags->use_human_names ? db->hdrs[i].human_name : db->hdrs[i].name);
+            header = ((flags->use_human_names && db->hdrs[i].human_name) ? db->hdrs[i].human_name : db->hdrs[i].name);
             clen += strlen(header) + 1;
             result = realloc(result, clen);
             strcat(result, header);
