@@ -1,11 +1,21 @@
-#ifndef STARLING_DATABASE_H
-#define STARLING_DATABASE_H
+#ifndef STARLING_H
+#define STARLING_H
+
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef NULL
 #define NULL (void *)0x00
 #endif
-#ifdef __cplusplus
-extern "C" {
+
+#ifdef HAS_LIBINTL_H
+#include <libintl.h>
+#define _(x) gettext(x)
+#else
+#define _(x) x
 #endif
 
 typedef enum {
@@ -142,4 +152,5 @@ char       * starling_tabulate_db(Starling_db *, Starling_table_flags *);
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif // STARLING_H

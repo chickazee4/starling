@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
-#include <libintl.h>
 
 #include "starling.h"
 
@@ -22,33 +21,35 @@ lowercase(const char *in)
 const char *
 starling_fieldtypetostr(Starling_field_type ft)
 {
+#ifdef HAS_LIBINTL_H
     bindtextdomain("starling", LOCALEDIR);
     textdomain("starling");
+#endif
     switch(ft){
         case FT_CHARACTER:
-            return gettext("character");
+            return _("character");
         case FT_CURRENCY:
-            return gettext("currency");
+            return _("currency");
         case FT_DATE:
-            return gettext("date");
+            return _("date");
         case FT_DATETIME:
-            return gettext("time");
+            return _("time");
         case FT_DOUBLE:
-            return gettext("double");
+            return _("double");
         case FT_FLOAT:
-            return gettext("float");
+            return _("float");
         case FT_GENERAL:
-            return gettext("general");
+            return _("general");
         case FT_INTEGER:
-            return gettext("integer");
+            return _("integer");
         case FT_LOGICAL:
-            return gettext("logical");
+            return _("logical");
         case FT_MEMO:
-            return gettext("memo");
+            return _("memo");
         case FT_NUMERIC:
-            return gettext("numeric");
+            return _("numeric");
         case FT_PICTURE:
-            return gettext("picture");
+            return _("picture");
         default:
             return NULL;
     }
@@ -57,8 +58,10 @@ starling_fieldtypetostr(Starling_field_type ft)
 char *
 starling_tabulate_fields(Starling_db *db, char *delim, int withinf)
 {
+#ifdef HAS_LIBINTL_H
     bindtextdomain("starling", LOCALEDIR);
     textdomain("starling");
+#endif
     char *ret = NULL, *length = malloc(10);
     int clen = 0, dlen = strlen(delim);
     memset(length, 0, 10);

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: starling-v0.1.3\n"
-"POT-Creation-Date: 2023-05-15 11:00-0600\n"
-"PO-Revision-Date: 2023-05-15 12:35-0600\n"
+"Project-Id-Version: starling-v0.3.0\n"
+"POT-Creation-Date: 2023-05-21 10:13-0600\n"
+"PO-Revision-Date: 2023-05-21 10:13-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -13,91 +13,71 @@ msgstr ""
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: src\n"
 "X-Poedit-SearchPath-1: libstarling\n"
 
-#: libstarling/src/tabulate.c:25
+#: libstarling/src/tabulate.c:30
 msgid "character"
 msgstr "символы"
 
-#: libstarling/src/tabulate.c:27
+#: libstarling/src/tabulate.c:32
 msgid "currency"
 msgstr "деньги"
 
-#: libstarling/src/tabulate.c:29
+#: libstarling/src/tabulate.c:34
 msgid "date"
 msgstr "срок"
 
-#: libstarling/src/tabulate.c:31
+#: libstarling/src/tabulate.c:36
 msgid "time"
 msgstr "время"
 
-#: libstarling/src/tabulate.c:33
+#: libstarling/src/tabulate.c:38
 msgid "double"
 msgstr "двойной"
 
-#: libstarling/src/tabulate.c:35
+#: libstarling/src/tabulate.c:40
 msgid "float"
 msgstr "поплавок"
 
-#: libstarling/src/tabulate.c:37
+#: libstarling/src/tabulate.c:42
 msgid "general"
 msgstr "общая"
 
-#: libstarling/src/tabulate.c:39
+#: libstarling/src/tabulate.c:44
 msgid "integer"
 msgstr "целое число"
 
-#: libstarling/src/tabulate.c:41
+#: libstarling/src/tabulate.c:46
 msgid "logical"
 msgstr "логическая"
 
-#: libstarling/src/tabulate.c:43
+#: libstarling/src/tabulate.c:48
 msgid "memo"
 msgstr "мемо"
 
-#: libstarling/src/tabulate.c:45
+#: libstarling/src/tabulate.c:50
 msgid "numeric"
 msgstr "число"
 
-#: libstarling/src/tabulate.c:47
+#: libstarling/src/tabulate.c:52
 msgid "picture"
 msgstr "изображение"
 
-#: libstarling/src/tabulate.c:61
-msgid "internal_name"
-msgstr "внутренное_название"
-
-#: libstarling/src/tabulate.c:61
-msgid "human_name"
-msgstr "название_для_людей"
-
-#: libstarling/src/tabulate.c:61 libstarling/src/tabulate.c:63
-#: src/starling2csv.c:217 src/starling2csv.c:219
-msgid "type"
-msgstr "тип"
-
-#: libstarling/src/tabulate.c:61 libstarling/src/tabulate.c:63
-msgid "length"
-msgstr "длина"
-
-#: libstarling/src/tabulate.c:63
-msgid "name"
-msgstr "название"
-
-#: src/starling2csv.c:52
+#: src/starling2csv.c:55
 msgid "You must specify an argument with the -d flag."
 msgstr "С указателем -d необходимо определить параметр."
 
-#: src/starling2csv.c:68
+#: src/starling2csv.c:71
 msgid "You must specify an argument with the -i flag."
 msgstr "С указателем -i необходимо определить параметр."
 
-#: src/starling2csv.c:89
+#: src/starling2csv.c:92
 msgid "You must specify an argument with the -o flag."
 msgstr "С указателем -o необходимо определить параметр."
 
-#: src/starling2csv.c:110
+#: src/starling2csv.c:113
 msgid "You must specify an argument with the -v flag."
 msgstr "С указателем -v необходимо определить параметр."
 
@@ -105,101 +85,120 @@ msgstr "С указателем -v необходимо определить п�
 msgid "You must specify a database!"
 msgstr "Необходимо определить базу данных!"
 
-#: src/starling2csv.c:133
-msgid "Warning: The database you're trying to load is known to cause crashes."
-msgstr ""
-"Замечание: Известно, что база данных, которую вы пытаетесь загрузить, "
-"вызывает сбои."
-
-#: src/starling2csv.c:135
-msgid ""
-"Error: The database you're trying to load is known to cause crashes. Loading "
-"has been suppressed."
-msgstr ""
-"Ошибка: Известно, что база данных, которую вы пытаетесь загрузить, вызывает "
-"сбои. Загрузка остановилась."
-
-#: src/starling2csv.c:152
+#: src/starling2csv.c:145
 msgid "Accessing and parsing database..."
 msgstr "Доступ и разбор базы данных..."
 
-#: src/starling2csv.c:156
+#: src/starling2csv.c:150
 msgid "Error"
 msgstr "Ошибка"
 
-#: src/starling2csv.c:159
+#: src/starling2csv.c:153
 msgid "Parser tried to exceed length of database"
 msgstr "Парсер попробовал переступить длину базы данных"
 
-#: src/starling2csv.c:162
+#: src/starling2csv.c:156
 msgid ""
 "Invalid record (delete flag not detected; check for database corruption)"
 msgstr ""
 "Неверная запись (флаг удаления не найден; ищите коррупции в базе данных)"
 
-#: src/starling2csv.c:165
+#: src/starling2csv.c:159
 msgid "Invalid header (check for database corruption)"
 msgstr "Неверный заголовок (ищите коррупции в базе данных)"
 
-#: src/starling2csv.c:168
+#: src/starling2csv.c:162
 msgid "Invalid var file"
 msgstr "Неверный файл .var"
 
-#: src/starling2csv.c:187
+#: src/starling2csv.c:165
+msgid "Invalid dbf file"
+msgstr "Неверный файл .dbf"
+
+#: src/starling2csv.c:182
 msgid ""
 "Error: Specified -I flag, but no .inf file exists and none was provided."
 msgstr ""
 "Ошибка: Определен флаг -I, но не удалось автоматически найти файл .inf и "
 "название не определено пользователем."
 
-#: src/starling2csv.c:199
+#: src/starling2csv.c:194
 msgid "Dereferencing external variables and decoding..."
 msgstr "Разыменование внешних переменных и декодирование..."
 
-#: src/starling2csv.c:204
+#: src/starling2csv.c:199
 msgid "Eureka!"
 msgstr "Ура!"
 
-#: src/starling2csv.c:205
+#: src/starling2csv.c:200
 msgid "Database last updated"
 msgstr "База данных была изменена"
 
-#: src/starling2csv.c:206
+#: src/starling2csv.c:201
 msgid "Number of records"
 msgstr "Подсчет записей"
 
-#: src/starling2csv.c:207
+#: src/starling2csv.c:202
 msgid "Number of fields"
 msgstr "Подсчет полей"
 
-#: src/starling2csv.c:210
+#: src/starling2csv.c:205
 msgid "Database summary"
 msgstr "Резюме базы данных"
 
-#: src/starling2csv.c:214
+#: src/starling2csv.c:209
 msgid "Fields"
 msgstr "Поля"
 
-#: src/starling2csv.c:217
+#: src/starling2csv.c:212 src/starling2csv.c:214
+msgid "type"
+msgstr "тип"
+
+#: src/starling2csv.c:212
 msgid "human name"
 msgstr "название для людей"
 
-#: src/starling2csv.c:225
+#: src/starling2csv.c:220
 msgid "Generating table..."
 msgstr "Создание таблицы..."
 
-#: src/starling2csv.c:238
+#: src/starling2csv.c:233
 msgid "Error in table creation!"
 msgstr "Ошибка в создании таблицы!"
 
-#: src/starling2csv.c:246
+#: src/starling2csv.c:241
 msgid "Writing to file..."
 msgstr "Сохранение..."
 
-#: src/starling2csv.c:250
+#: src/starling2csv.c:245
 msgid ""
 "Warning: specified output file is in a location that does not exist or is "
 "inaccessible. Writing to stdout instead."
 msgstr ""
 "Замечание: определенный файл находится в месте, которое не существует или "
 "этой программе не доступно. Результаты написаны в stdout."
+
+#~ msgid "internal_name"
+#~ msgstr "внутренное_название"
+
+#~ msgid "human_name"
+#~ msgstr "название_для_людей"
+
+#~ msgid "length"
+#~ msgstr "длина"
+
+#~ msgid "name"
+#~ msgstr "название"
+
+#~ msgid ""
+#~ "Warning: The database you're trying to load is known to cause crashes."
+#~ msgstr ""
+#~ "Замечание: Известно, что база данных, которую вы пытаетесь загрузить, "
+#~ "вызывает сбои."
+
+#~ msgid ""
+#~ "Error: The database you're trying to load is known to cause crashes. "
+#~ "Loading has been suppressed."
+#~ msgstr ""
+#~ "Ошибка: Известно, что база данных, которую вы пытаетесь загрузить, "
+#~ "вызывает сбои. Загрузка остановилась."
