@@ -1,4 +1,4 @@
-## v0.3.0
+## v0.3.0 - 05/21/23
 * Improvements to memory handling in tabulate/sanitize functions
     - Tabulate previously allocated a finite amount of memory; a hypothetical very large database would have overflown the buffer, although none of Starostin's are actually big enough. It now flexibly allocates memory depending on the database, which reduces memory consumption in most cases and makes the library more extensible. Slightly laggier operation and increased CPU usage when tabulating may be noticed, but these appear to be relatively minimal and should be outweighed by the benefits. 
     - All pointers allocated by sanitize functions *should* now be freeable, reducing the incidence of memory leaks in starling2csv and any other software derivative of libstarling.
