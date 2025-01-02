@@ -1,3 +1,6 @@
+## v0.3.1 - 01/01/25
+* Fixed some uppercase Cyrillic letters being omitted from output due to flaws in logic flow in `decode.c`
+
 ## v0.3.0 - 05/21/23
 * Improvements to memory handling in tabulate/sanitize functions
     - Tabulate previously allocated a finite amount of memory; a hypothetical very large database would have overflown the buffer, although none of Starostin's are actually big enough. It now flexibly allocates memory depending on the database, which reduces memory consumption in most cases and makes the library more extensible. Slightly laggier operation and increased CPU usage when tabulating may be noticed, but these appear to be relatively minimal and should be outweighed by the benefits. 

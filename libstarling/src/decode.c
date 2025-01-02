@@ -124,20 +124,23 @@ starling_decode_text(char **out, unsigned char *in, int len)
                 bytemode = 1;
                 break;
             case 0x83:
-                current = &grk_dualbyte;
-                break;
+                if (bytemode == 2){
+                    current = &grk_dualbyte;
+                    break;
+                }
             case 0x85:
                 if(bytemode == 2 && i < len - 1 && in[i+1] == 0xAF){
                     clen = strlen("\u03DD");
                     i++;
                     strcat(ret, "\u03DD");
                     cpos += clen;
+                    break;
                 }
-                break;
             case 0x87:
-                if(bytemode == 2)
+                if(bytemode == 2){
                     current = &cyr_dualbyte;
-                break;
+                    break;
+                }
             case 0x88:
                 if(bytemode == 2 && i < len - 1){
                     switch(in[i+1]){
@@ -156,8 +159,6 @@ starling_decode_text(char **out, unsigned char *in, int len)
                             break;
                     }
                 }
-                i++;
-                break;
             default:
                 if(bytemode == 2 && in[i] < 0x7F) {
                     current = &unibyte;
