@@ -6,7 +6,8 @@ Your program must be linked to `libstarling.so`.  All of `libstarling`'s functio
 
 This header contains the following data structures:
 
-* `Starling_field_type` (`enum`): the 12 "field types" possible for a Starling field (character, numeric, etc.). Most of these are quite rare; character is the most common. The "field type" is immaterial to the actual type that the data is stored as by `libstarling`, which will always be a `char *`, but it could be useful for casting/parsing the data.
+* `Starling_return_code` (`enum`): rather than plain integer error codes, library functions which return integers will return one or more of the named codes within this enum — check the source library header for all options (should all be more or less self-explanatory).
+* `Starling_field_type` (`enum`): the 12 "field types" possible for a Starling field (character, numeric, etc.). Most of these are quite rare; character is the most common. The "field type" is immaterial to the C type that the data is stored as by `libstarling`, which will always be a `char *`, but it could be useful for casting/parsing the data. Check the source code to see all options. They are mostly self-explanatory except for `FT_LOGICAL` (these are simply booleans) and `FT_MEMO` (this doesn't seem to be used in Starling, but in the base DBF format, it does something similar to what entries specified as "external" do in Starling).
 * `Starling_entry_type` (`enum`): either `ET_INTERNAL` or `ET_EXTERNAL`. `ET_EXTERNAL` refers to a field in the .dbf that does not contain content, but rather a pointer to somewhere in the database's .var file. `ET_INTERNAL` is used for a field that contains all of its content in the .dbf itself.
 * `Starling_record_hdr` (`struct`): the struct representation of a Starling field, basically equivalent to a column of data. This struct contains the following members:
   - `name` (`char *`): the name of the field (=column heading).
@@ -41,9 +42,9 @@ This header contains the following data structures:
   - `db_description` (`char *`): the description of the database from any/all DBINFO blocks in the corresponding .inf file for the database, if one exists
   - `is_altai`/`is_stibet` (`int`): indicate whether the database is altai.dbf or stibet.dbf. Both appear to have specific corrupted records in the versions distributed by the Starling website and will crash the program unless this is set. This will omit the responsible records in output: in altet.dbf, only the 5th field of the 1728th record is impacted, while in stibet.dbf, the entire 2785th record is skipped due to multiple corrupted entries. 
 * `Starling_sanitize_flags` (`struct`): a set of flags pertaining to text operations that will be performed on entries, for use with the `starling_tabulate_db()` and `starling_sanitize()` functions.
-  - `starling_clean_delims` (`int`): if set to 1, those functions will call `starling_clean_delims()` on the input entry/entries, which deletes tabs, newlines, and commas.
-  - `starling_clean_tags` (`int`): if set to 1, those functions will call `starling_clean_tags()` for each input entry/entries, deleting Starling's custom formatting tags from entry text.
-  - `starling_clean_spaces` (`int`): if set to 1, those functions will call `starling_clean_spaces()` for each input entry/entries, deleting leading, trailing, and duplicated spaces.
+  - `clean_delims` (`int`): if set to 1, those functions will call `starling_clean_delims()` on the input entry/entries, which deletes tabs, newlines, and commas.
+  - `clean_tags` (`int`): if set to 1, those functions will call `starling_clean_tags()` for each input entry/entries, deleting Starling's custom formatting tags from entry text.
+  - `clean_spaces` (`int`): if set to 1, those functions will call `starling_clean_spaces()` for each input entry/entries, deleting leading, trailing, and duplicated spaces.
 * `Starling_table_flags` (`struct`): a set of flags that define the behavior of `starling_tabulate_db()` when called.
   - `lowercase_labels` (`int`): if set to 1, the names of fields will be transformed to lowercase when producing a CSV table (since they are usually, possibly always, entered in all-caps in original Starling databases).
   - `label_rows` (`int`): if set to 1, records will be printed as columns and fields will be printed as rows (default behavior is the other way around). This typically produces a vertically shorter but horizontally longer table.
